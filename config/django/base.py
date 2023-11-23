@@ -1,5 +1,6 @@
 import os
 from config.env import env, BASE_DIR
+from configs import REDIS_URL, DATABASE_URL, PG_PASSWORD, PG_USER
 
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -81,7 +82,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db('DATABASE_URL', default='psql://amrakbari:Severus2322@127.0.0.1:5432/myshop'),
+    'default': env.db('DATABASE_URL', default=DATABASE_URL),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
@@ -90,8 +91,8 @@ if os.environ.get('GITHUB_WORKFLOW'):
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'github_actions',
-            'USER': 'amrakbari',
-            'PASSWORD': 'Severus2322',
+            'USER': PG_USER,
+            'PASSWORD': PG_PASSWORD,
             'HOST': '127.0.0.1',
             'PORT': '5432',
         }
@@ -153,7 +154,7 @@ REST_FRAMEWORK = {
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': env("REDIS_LOCATION", default="redis://localhost:6379"),
+        'LOCATION': env("REDIS_LOCATION", default=REDIS_URL),
     }
 }
 # Cache time to live is 15 minutes.
