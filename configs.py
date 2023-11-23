@@ -1,6 +1,9 @@
 import os
 
-os.loadenv()
+import dotenv
+
+dotenv.load_dotenv()
+
 
 PG_USER = os.getenv("POSTGRES_USER")
 PG_PASSWORD = os.getenv("POSTGRES_PASSWORD")
