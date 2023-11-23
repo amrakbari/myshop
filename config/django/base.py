@@ -1,6 +1,5 @@
 import os
 from config.env import env, BASE_DIR
-from configs import REDIS_URL, DATABASE_URL, PG_PASSWORD, PG_USER
 
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -82,7 +81,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db('DATABASE_URL', default=DATABASE_URL),
+    'default': env.db('DATABASE_URL', default='psql://amrakbari:1qaz!QAZ@127.0.0.1:5432/myshop'),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
@@ -91,8 +90,8 @@ if os.environ.get('GITHUB_WORKFLOW'):
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'github_actions',
-            'USER': PG_USER,
-            'PASSWORD': PG_PASSWORD,
+            'USER': 'amrakbari',
+            'PASSWORD': '1qaz!QAZ',
             'HOST': '127.0.0.1',
             'PORT': '5432',
         }
@@ -154,7 +153,7 @@ REST_FRAMEWORK = {
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': env("REDIS_LOCATION", default=REDIS_URL),
+        'LOCATION': env("REDIS_LOCATION", default="redis://localhost:6379"),
     }
 }
 # Cache time to live is 15 minutes.
@@ -164,6 +163,11 @@ CACHE_TTL = 60 * 15
 APP_DOMAIN = env("APP_DOMAIN", default="http://localhost:8000")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+
 
 from config.settings.cors import *  # noqa
 from config.settings.jwt import *  # noqa

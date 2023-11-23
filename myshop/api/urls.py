@@ -1,5 +1,5 @@
 from django.urls import path, include
 
 urlpatterns = [
-    # path('blog/', include(('myshop.blog.urls', 'blog')))
+    path('store/', include(('myshop.store.urls', 'store')))
 ]
