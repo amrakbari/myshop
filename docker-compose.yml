@@ -6,10 +6,8 @@ services:
     container_name: postgres
     ports:
       - 5432:5432
-    environment:
-      - POSTGRES_DB=myshop
-      - POSTGRES_USER=amrakbari
-      - POSTGRES_PASSWORD=Severus2322
+    env_file:
+      - .env
 
   rabbitmq:
     image: "rabbitmq:alpine"
@@ -26,9 +24,8 @@ services:
       dockerfile: docker/production.Dockerfile
     container_name: django
     command: ./docker/web_entrypoint.sh
-    environment:
-      - DATABASE_URL=psql://amrakbari:Severus2322@db:5432/myshop
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+    env_file:
+      - .env
     volumes:
       - .:/app
     ports:
@@ -45,9 +42,8 @@ services:
     # command: celery -A myshop.tasks worker -l info --without-gossip --without-mingle --without-heartbeat
     container_name: worker
     command: ./docker/celery_entrypoint.sh
-    environment:
-      - DATABASE_URL=psql://amrakbari:Severus2322@db:5432/myshop
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+    env_file:
+      - .env
     volumes:
       - .:/app
     depends_on:
@@ -62,9 +58,8 @@ services:
     # command: celery -A myshop.tasks beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     container_name: beats
     command: ./docker/beats_entrypoint.sh
-    environment:
-      - DATABASE_URL=psql://amrakbari:Severus2322@db:5432/myshop
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+    env_file:
+      - .env
     volumes:
       - .:/app
     depends_on:
