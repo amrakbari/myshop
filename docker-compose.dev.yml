@@ -7,10 +7,8 @@ services:
     container_name: postgres
     ports:
       - 5432:5432
-    environment:
-      - POSTGRES_DB=myshop
-      - POSTGRES_USER=amrakbari
-      - POSTGRES_PASSWORD=Severus2322
+    env_file:
+      - .env
     volumes:
       - postgres-data:/var/lib/postgresql/data/
 
@@ -18,9 +16,8 @@ services:
     container_name: pgadmin4_container
     image: dpage/pgadmin4
     restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: 'pg_pass'
+    env_file:
+      - .env
     ports:
       - "5050:80"
 
