@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +9,7 @@ from myshop.store.services.products import create_product
 
 class ProductApi(APIView):
 
+    @extend_schema(request=ProductInputSerializer, responses=ProductOutputSerializer)
     def post(self, request):
         input_serializer = ProductInputSerializer(data=request.data)
         input_serializer.is_valid(raise_exception=True)
@@ -16,7 +18,6 @@ class ProductApi(APIView):
                 input_serializer.validated_data.get('name'),
                 input_serializer.validated_data.get('description'),
                 input_serializer.validated_data.get('price'),
-                input_serializer.validated_data.get('image'),
             )
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
