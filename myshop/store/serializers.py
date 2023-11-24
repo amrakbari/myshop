@@ -9,6 +9,10 @@ class ProductInputSerializer(serializers.Serializer):
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
 
+class ProductImageInputSerializer(serializers.Serializer):
+    image = serializers.FileField()
+
+
 class ProductOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
