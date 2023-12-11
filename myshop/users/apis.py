@@ -1,3 +1,7 @@
+from django.contrib.auth.tokens import default_token_generator
+from django.shortcuts import render
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -19,7 +23,7 @@ class ProfileApi(ApiAuthMixin, APIView):
     class OutPutSerializer(serializers.ModelSerializer):
         class Meta:
             model = Profile 
-            fields = ("bio", "posts_count", "subscriber_count", "subscription_count")
+            fields = "__all__"
 
     @extend_schema(responses=OutPutSerializer)
     def get(self, request):
@@ -32,7 +36,6 @@ class RegisterApi(APIView):
 
     class InputRegisterSerializer(serializers.Serializer):
         email = serializers.EmailField(max_length=255)
-        bio = serializers.CharField(max_length=1000, required=False)
         password = serializers.CharField(
                 validators=[
                         number_validator,
@@ -85,12 +88,26 @@ class RegisterApi(APIView):
             user = register(
                     email=serializer.validated_data.get("email"),
                     password=serializer.validated_data.get("password"),
-                    bio=serializer.validated_data.get("bio"),
                     )
         except Exception as ex:
             return Response(
-                    f"Database Error {ex}",
+                    str(ex),
                     status=status.HTTP_400_BAD_REQUEST
                     )
         return Response(self.OutPutRegisterSerializer(user, context={"request":request}).data)
 
+
+class ActivateApiView(APIView):
+    def post(request, uidb64, token):
+        try:
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            user = BaseUser.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, BaseUser.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            return render(request, 'activation_successful.html')
+        else:
+            return render(request, 'activation_failed.html')
