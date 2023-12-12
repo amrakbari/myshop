@@ -98,9 +98,9 @@ class RegisterApi(APIView):
 
 
 class ActivateApiView(APIView):
-    def post(request, uidb64, token):
+    def get(self, request, uidb64, token):
         try:
-            uid = force_text(urlsafe_base64_decode(uidb64))
+            uid = force_str(urlsafe_base64_decode(uidb64))
             user = BaseUser.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, BaseUser.DoesNotExist):
             user = None
