@@ -6,9 +6,8 @@ from django.contrib.auth.models import BaseUserManager as BUM
 from django.contrib.auth.models import PermissionsMixin
 
 
-
 class BaseUserManager(BUM):
-    def create_user(self, email, is_active=True, is_admin=False, password=None):
+    def create_user(self, email, is_active=False, is_admin=False, password=None):
         if not email:
             raise ValueError("Users must have an email address")
 
@@ -31,6 +30,7 @@ class BaseUserManager(BUM):
             is_admin=True,
             password=password,
         )
+        user.is_staff = True
 
         user.is_superuser = True
         user.save(using=self._db)
@@ -39,11 +39,18 @@ class BaseUserManager(BUM):
 
 
 class BaseUser(BaseModel, AbstractBaseUser, PermissionsMixin):
+    SELLER = "SL"
+    BUYER = "BY"
 
-    email = models.EmailField(verbose_name = "email address",
+    ROLE_CHOICES = (
+        (SELLER, "Seller"),
+        (BUYER, "Buyer"),
+    )
+
+    email = models.EmailField(verbose_name="email address",
                               unique=True)
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
 
     objects = BaseUserManager()
@@ -59,16 +66,6 @@ class BaseUser(BaseModel, AbstractBaseUser, PermissionsMixin):
 
 class Profile(models.Model):
     user = models.OneToOneField(BaseUser, on_delete=models.CASCADE)
-    posts_count = models.PositiveIntegerField(default=0)
-    subscriber_count = models.PositiveIntegerField(default=0)
-    subscription_count = models.PositiveIntegerField(default=0)
-    bio = models.CharField(max_length=1000, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user} >> {self.bio}"
-
-
-
-
-
-
+        return self.user
